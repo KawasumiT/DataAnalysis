@@ -1,0 +1,473 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE rflow [
+<!ENTITY lt "&#38;#60;">
+<!ENTITY gt "&#62;">
+<!ENTITY amp "&#38;#38;">
+<!ENTITY apos "&#39;">
+<!ENTITY quot "&#34;">
+]>
+<rflow>
+	<graph version="0.8" width="1212" height="633" locationtype="a" offsetx="90" offsety="-28">
+		<setting>
+			<entry key="USE_GRID">true</entry>
+			<entry key="FOLDER">データ一覧と整理</entry>
+			<entry key="GRID_DISTANCE2">10</entry>
+		</setting>
+<properties>
+<v key="packages"/>
+</properties>
+		<node id="0" date="1631363307658" uid="7761703048a3ceba" x="860" y="120">
+			<command>plot(HAKUSAN[,c(2,3,4)], main=&quot;(i) 船舶の横揺れ（上段）、縦揺れ（中段）、舵角（下段）&quot;)
+# 太平洋を航行中の船舶の横揺れ、縦揺れ、および舵角を１秒ごとに記録した多変量時系列
+# 横揺れと舵角はともに十数秒程度の周期的な変動をしていることがわかる
+# 一方、縦揺れは１０秒以下の短い周期で変動している</command>
+			<property title="(i) 船舶の横揺れ/縦揺れ/舵角"/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="1" date="1631463020934" uid="b4cd5202b68877a9" x="760" y="630">
+			<command># 相互相関関数
+par(mar=c(2,4,3,1) + 0.1)
+crscor(Haibara, lag=50)</command>
+			<property/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="2" date="1631456974161" uid="c0beb4b686010807" x="560" y="530">
+			<command># 自己相関関数
+par(mfrow=c(2,1))
+plot(MYE1F, main=&quot;(f)地震波（東西方向）&quot;)
+unicor(MYE1F, lag=50)
+# 最初急激な現象した後、ラグの10程度の間隔で振動が続いており、その減衰はかなり遅い
+</command>
+			<property/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="3" date="1631363303121" uid="d02f8f3807ae3804" x="760" y="120">
+			<command>plot(Haibara, main=&quot;(h)地下水位(上段）と気圧（下段）&quot;)
+# 東海地方の観測点で地下水位と気圧の変動を10分毎に観測した２変量時系列データ
+# 折れ線の空白部分は何らかの原因で観測が行われていなかったとのこと
+# 水位データのところどころに上方に飛び出したデータがあり、観測機器の異常値である</command>
+			<property title="(h)地下水位/気圧"/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="4" date="1631360103379" uid="984ab958d02ae837" x="450" y="30">
+			<command>library(TSSS)
+data(HAKUSAN) # 船舶の航行中の多変量データ
+data(Sunspot) # 太陽黒点数データ
+data(Temperature) # 東京の日最高気温データ
+data(BLSALLFOOD) # アメリカの食品産業の従業者数
+data(WHARD) # あるハードウェアの卸売高データ
+data(MYE1F) # 地震波データ
+data(Nikkei225) # 日経225 平均株価データ
+data(Rainfall) # 各月日について東京で２年間に雨が振った回数
+data(Haibara) # 地下水位データ</command>
+			<property title="data" shape="INOUT"/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="5" date="1631456538691" uid="a21d5f56a7815db4" x="360" y="530">
+			<command># 自己相関関数
+par(mfrow=c(2,1))
+plot(BLSALLFOOD, main=&quot;(d)アメリカの食品産業の従業者数&quot;)
+unicor(BLSALLFOOD, lag=50)
+# 年周期とトレンドが存在することから、標本自己相関関数にも年周期が見られる
+# 減衰は(b)よりもさらに遅い
+</command>
+			<property/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="6" date="1631459540391" uid="a48fd54f2ed96b3b" x="860" y="530">
+			<command># 多変量時系列のhistと散布図
+par(pch=&quot;.&quot;)
+pairs(HAKUSAN[,c(2,3,4)], diag.panel=panel.hist)
+
+# 「横揺れと縦揺れ」、「縦揺れと舵角」には負の相関が見られる。
+# 一方、縦揺れと舵角に関しては円形に散らばっており、同時刻間の関係はほとんどないことがわかる
+
+
+# 同様に以下の書き方もでき、相関係数を確かめることができる
+library(psych)
+psych::pairs.panels(HAKUSAN[,c(2,3,4)])
+
+
+</command>
+			<property/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="7" date="1631457253049" uid="f1ee4c34c600cdc5" x="60" y="450">
+			<command># 散布図で表現
+par( mfrow=c(4,2), mar=c(2,2.5,3,1) + 0.1)
+
+plot(HAKUSAN[,1], main=&quot;(a) 方向角速度&quot;)
+plot(HAKUSAN[,2], main=&quot;(b) 横揺れ&quot;)
+
+hist(HAKUSAN[,1], main=&quot;(a) 方向角速度&quot;)
+hist(HAKUSAN[,2], main=&quot;(b) 横揺れ&quot;, breaks=seq(-6, 12, 1.2))
+
+x &lt;- as.ts(HAKUSAN[,1])
+y &lt;- as.ts(HAKUSAN[,2])
+plot(x, lag(x, k=2), pch=20, main=&quot;(c) lag=2&quot;)
+plot(y, lag(y, k=2), pch=20, main=&quot;(d) lag=2&quot;)
+plot(x, lag(x, k=4), pch=20, main=&quot;(e) lag=4&quot;)
+plot(y, lag(y, k=4), pch=20, main=&quot;(f) lag=4&quot;)</command>
+			<property/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="8" date="1631363120552" uid="50547d30e9d9d4ec" x="260" y="120">
+			<command>plot(Temperature, main=&quot;(c) 東京の日最高気温&quot;)
+# 東京の毎日の最高気温を16ヵ月にわたって記録したもの
+# 支配的な年周期（トレンド）が見られるが年周期のまわりでは不規則な変動をしている</command>
+			<property title="(c) 東京の日最高気温"/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="9" date="1631365903560" uid="dd1bafc5b41859e2" x="660" y="220">
+			<command># 非定常
+# 平均が時間とともに変動している</command>
+			<property shape="STAR"/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="10" date="1631457319838" uid="54dccf864afe37ce" x="-40" y="30">
+			<command># unicor関数
+myUnicorPlot &lt;- function(data_, lag_, main_ = &quot;&quot;){
+	unicor01 &lt;- unicor(data_, lag=lag_, plot=FALSE)$acov
+	plot(unicor01, type=&apos;h&apos;, main=main_)
+	points(unicor01, type=&apos;l&apos;)
+	points(cbind(seq(0, lag_ + 1, 1), 0), type=&quot;l&quot;)
+}
+
+#
+panel.hist &lt;- function(x, ...)
+{
+	usr &lt;- par(&quot;usr&quot;); on.exit(par(usr))
+	par(usr = c(usr[1:2], 0, 1.5) )
+	h &lt;- hist(x, plot = FALSE)
+	breaks &lt;- h$breaks; nB &lt;- length(breaks)
+	y &lt;- h$counts; y &lt;- y/max(y)
+	rect(breaks[-nB], 0, breaks[-1], y, col = &quot;cyan&quot;, ...)
+}</command>
+			<property title="関数解像" shape="STAR"/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="11" date="1631463009671" uid="b41c68c3de22b1b" x="990" y="710">
+			<command></command>
+			<property/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="12" date="1631366513041" uid="9ddaf0f2e73eae8c" x="460" y="300">
+			<command># 変数変換 (e), (g)
+# 金額や人数などの正値データの多くは、値の増加に伴って変動の大きさも増大する特徴がある。
+data(WHARD)
+log_WHARD &lt;- log10( WHARD )
+par( mfrow = c(2,1), mar=c(2,4,1,1) + 0.1)
+plot(WHARD, type=&quot;l&quot;)
+plot(log_WHARD, type=&quot;l&quot;)
+
+# 差分
+# 季節変動が見られる場合には１周期前の値との差分を利用することがある（季節差分）
+</command>
+			<property/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="13" date="1631366133092" uid="793cb63b17e8b0e3" x="160" y="220">
+			<command># ～変換すればガウス型時系列に～
+# 変動パターンに上下非対称性が見られ、そのままでは周辺分布が正規分布とみなせない時系列でも
+# データに適切な変換を施すことによって近似的にガウス型時系列と見なせるようになる
+plot(log(Sunspot), main=&quot;(b) 太陽黒点数&quot;)
+
+
+# 時系列の分布が正規分布に従うもの→ガウス型時系列
+# そうでないもの→非ガウス型時系列</command>
+			<property shape="STAR"/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="14" date="1631426715087" uid="f35d749756baea55" x="260" y="360">
+			<command># 移動メディアン
+# 移動メディアンは原データに見られる大きな偏差の影響を受けにくい
+data(Temperature)
+y &lt;- Temperature
+ndata &lt;- length(Temperature)
+kfilters &lt;- c(0, 14)
+par(mfrow = c(2, length(kfilters)), mar=c(5,4,3,1) + 0.1)
+for(kfilter in kfilters){
+	y[1:ndata] &lt;- NA
+	for(i in 1:ndata){
+		i0 &lt;- max(i - kfilter, 1)
+		i1 &lt;- min(i + kfilter, ndata)
+		y[i] &lt;- mean(Temperature[i0:i1])
+	}
+	plot(y, ylim=c(0,40), type=&apos;l&apos;, main=paste(&quot;移動平均 kfilter=&quot;, kfilter))
+}
+for(kfilter in kfilters){
+	y[1:ndata] &lt;- NA
+	for(i in 1:ndata){
+		i0 &lt;- max(i - kfilter, 1)
+		i1 &lt;- min(i + kfilter, ndata)
+		y[i] &lt;- median(Temperature[i0:i1])
+	}
+	plot(y, ylim=c(0,40), type=&apos;l&apos;, main=paste(&quot;移動メディアン kfilter=&quot;, kfilter))
+}</command>
+			<property/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="15" date="1631365860122" uid="b442001b19980125" x="60" y="220">
+			<command># 定常
+# 一見したところ時間的に変化しない一定の確率モデルとみなすことができるもの</command>
+			<property shape="STAR"/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="16" date="1631430583189" uid="823c6828952d88a8" x="60" y="530">
+			<command># 自己相関関数
+par(mfrow=c(2,2), mar=c(2,2.5,3,1) + 0.1)
+plot(HAKUSAN[,1], main=&quot;(a) 船舶の方向角速度&quot;)
+plot(HAKUSAN[,2], main=&quot;(b) 横揺れ&quot;)
+
+myUnicorPlot(HAKUSAN[,1], lag=50, main=&quot;(a)の自己相関関数&quot;)
+myUnicorPlot(HAKUSAN[,2], lag=50, main=&quot;(a)の自己相関関数&quot;)
+
+# 定常時系列の場合、標本自己相関関数はラグの増加とともに急速に０に減衰している
+</command>
+			<property/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="17" date="1631426237762" uid="b225e77b89a138e7" x="260" y="300">
+			<command># 移動平均
+data(Temperature)
+y &lt;- Temperature
+ndata &lt;- length(Temperature)
+par(mfrow = c(2, 2), mar=c(5,4,3,1) + 0.1)
+kfilters &lt;- c(0, 2, 8, 14)
+for(kfilter in kfilters){
+	y[1:ndata] &lt;- NA
+	for(i in 1:ndata){
+		i0 &lt;- max(i - kfilter, 1)
+		i1 &lt;- min(i + kfilter, ndata)
+		y[i] &lt;- mean(Temperature[i0:i1])
+	}
+	plot(y, ylim=c(0,40), type=&apos;l&apos;, main=paste(&quot;kfilter=&quot;, kfilter))
+}</command>
+			<property/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="18" date="1631462444055" uid="148d2b89aebd8523" x="860" y="220">
+			<command></command>
+			<property title="多変量(3変量)" shape="STAR"/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="19" date="1631456223988" uid="264e648768c23b24" x="260" y="530">
+			<command># 自己相関関数
+par(mfrow=c(2,1))
+plot(Temperature, main=&quot;(c) 東京の日最高気温&quot;)
+unicor(Temperature, lag=50)
+# １年周期の滑らかなトレンドが卓越していることから標本自己相関関数の減衰はきわめて遅い
+# このような現象は平均値が時間的に変動する非定常時系列に典型的に見られる。
+</command>
+			<property/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="20" date="1631366077505" uid="9f030410cb8a5d5d" x="560" y="220">
+			<command># 非定常
+# 平均まわりの変動の仕方が時間的に変化しているもの</command>
+			<property shape="STAR"/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="21" date="1631363265775" uid="2bfd845c9fa67d36" x="560" y="120">
+			<command>plot(MYE1F, main=&quot;(f)地震波（東西方向）&quot;)
+# 地震波の東西成分を約0.02秒間隔で記録したもの
+# P波(縦波)とS波(横波)の到着に伴って変動の大きさが著しく変化している
+# 詳しく調べてみると、振幅だけでなく変動の仕方自体も変化していることがわかる
+</command>
+			<property title="(f)地震波（東西方向）"/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="22" date="1631366006857" uid="5498ad8908fe83e8" x="360" y="220">
+			<command># 非定常
+# 平均が時間とともに変動している</command>
+			<property shape="STAR"/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="23" date="1631456790075" uid="fe5d6d65a0b68d" x="460" y="530">
+			<command># 自己相関関数
+par(mfrow=c(2,1))
+plot(log(WHARD), main=&quot;(e)あるハードウェアの卸売高データ&quot;)
+unicor(log(WHARD), lag=50)
+# 経済時系列では年とともに値が増加しそれに伴って変動幅も変動幅が大きくなっているので
+# まず対数変換を行いそのデータの標本自己相関関数を求めている
+</command>
+			<property/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="24" date="1631462442508" uid="b5d7663df5f103e8" x="760" y="220">
+			<command></command>
+			<property title="多変量(2変量)" shape="STAR"/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="25" date="1631363315411" uid="2ebccda33593d5a8" x="960" y="120">
+			<command>plot(Rainfall, main=&quot;(j)各月日について東京で２年間に雨が振った回数&quot;)</command>
+			<property title="(j)２年間に雨が振った回数(東京)"/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="26" date="1631363111446" uid="e02a77aabfee5114" x="160" y="120">
+			<command>plot(Sunspot, main=&quot;(b) 太陽黒点数&quot;)
+# 毎年の太陽黒点数　ほぼ11年周期で同様なパターンで増減している</command>
+			<property title="(b) 太陽黒点数"/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="27" date="1631365872963" uid="8b955e029840d3fb" x="260" y="220">
+			<command># 非定常
+# 平均が時間とともに変動している</command>
+			<property shape="STAR"/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="28" date="1631460342565" uid="338826e6bafd8816" x="760" y="530">
+			<command># 多変量時系列のhistと散布図
+pairs(Haibara, diag.panel=panel.hist)
+
+# すべての点が負の傾きの直線付近に集中している
+# 地下水位の上下が気圧の増減にきわめてよく対応していることがわかる
+
+
+library(psych)
+psych::pairs.panels(Haibara)
+
+# </command>
+			<property/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="29" date="1631360594710" uid="aa66f33e38b74622" x="60" y="120">
+			<command>plot(HAKUSAN[,1], main=&quot;(a) 船舶の方向角速度&quot;)
+# 外洋を航行中の船舶の角速度を１秒ごとに記録したもの
+# 針路を一定に保針制御があり方向角速度は０前後を変動している</command>
+			<property title="(a) 船舶の方向角速度"/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="30" date="1631366515225" uid="e6fde61592802830" x="660" y="300">
+			<command># 差分 (c),(d),(e),(g) などトレンドを含む場合、
+# 差分時系列を求めることがある。
+plot(diff (log(Nikkei225)))
+
+# 対数差分はファイナンスでは収益率の代わりに用いられることが多い
+# n=500付近を境に変動の大きさが大きく変化している→詳しくは13.1, 14.5
+</command>
+			<property/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="31" date="1631363158650" uid="1d8a4eeedfaec7f2" x="950" y="30">
+			<command>plot(HAKUSAN[,1], main=&quot;(a) 船舶の方向角速度&quot;)
+plot(Sunspot, main=&quot;(b) 太陽黒点数&quot;)
+plot(Temperature, main=&quot;(c) 東京の日最高気温&quot;)
+plot(BLSALLFOOD, main=&quot;(d)アメリカの食品産業の従業者数&quot;)
+plot(WHARD, main=&quot;(e)あるハードウェアの卸売高データ&quot;)
+plot(MYE1F, main=&quot;(f)地震波（東西方向）&quot;)
+plot(Nikkei225, main=&quot;(g)日経225 平均株価データ&quot;)
+plot(Haibara, main=&quot;(h)地下水位(上段）と気圧（下段）&quot;)
+plot(HAKUSAN[,c(2,3,4)], main=&quot;(i) 船舶の横揺れ（上段）、縦揺れ（中段）、舵角（下段）&quot;)
+plot(Rainfall, main=&quot;(j)各月日について東京で２年間に雨が振った回数&quot;)</command>
+			<property title="plot (a) - (j)"/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="32" date="1631363254978" uid="1111268c3c5a0dfb" x="360" y="120">
+			<command>plot(BLSALLFOOD, main=&quot;(d)アメリカの食品産業の従業者数&quot;)
+# アメリカの食品産業に従事する労働者の人数を毎月調べたもの
+# 経済時系列特有な、「徐々に変化するトレンド成分」と「毎年同じように変動を繰り返す季節成分」
+# を含んでいる。</command>
+			<property title="(d)アメリカの食品産業の従業者数"/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="33" date="1631363260742" uid="fb1ae1536dd91fce" x="460" y="120">
+			<command>plot(WHARD, main=&quot;(e)あるハードウェアの卸売高データ&quot;)
+# あるハードウェアの毎月の卸売高を記録したデータ
+# 毎年ほぼ一定の割合で増加する経済時系列に特有な特徴が見られ、
+# それに伴ってトレンド周りの変動も徐々に大きくなっている
+</command>
+			<property title="(e)あるﾊｰﾄﾞｳｪｱの卸売高データ"/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="34" date="1631366011773" uid="eb53cb3256f79926" x="460" y="220">
+			<command># 非定常
+# 平均が時間とともに変動している</command>
+			<property shape="STAR"/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="35" date="1631463024093" uid="c4fba8aabd9eeaad" x="860" y="630">
+			<command># 相互相関関数
+par(mar=c(2,4,3,1) + 0.1)
+crscor(HAKUSAN[, 2:4], lag=50)</command>
+			<property/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="36" date="1631455692013" uid="a3aaf6d28021eb9c" x="160" y="530">
+			<command># 自己相関関数
+par(mfrow=c(2,1))
+plot(log(Sunspot), main=&quot;(b) 太陽黒点数(Log)&quot;)
+unicor(log(Sunspot), lag=50)
+# データに見られる１１年程度の繰り返しに対応して、自己相関関数にも１１年程度の周期的な変動が見られる
+# ※データには著しい上下非対称性が見られるので対数変換したデータの自己相関関数を示す。</command>
+			<property/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="37" date="1631363272007" uid="a7af31e46e73ed4b" x="660" y="120">
+			<command>plot(Nikkei225, main=&quot;(g)日経225 平均株価データ&quot;)
+# 1988/1/4 ～ 1993/12/30 の日次終値
+# 1989年末までほぼ単調に増加しているがバブル崩壊後は大きな変動を繰り返しながら
+# 徐々に下降している
+# 株価データの解析は対数変換後、差分をとってから行うことが多い
+</command>
+			<property title="(g)日経225 平均株価データ"/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="38" date="1631425241861" uid="c65136e002ef01ea" x="460" y="380">
+			<command># 前期比、前年同期比
+par(mfrow = c(3, 1))
+plot(WHARD / 1 , xlim = c(1968, 1980))
+plot(WHARD / lag(WHARD), xlim = c(1968, 1980)) # 前期比
+plot(WHARD / lag(WHARD, k=-12), xlim = c(1968, 1980)) # 前年同期比
+
+# 前期比によってトレンド成分が除去されていることがわかる
+# 前年同期比によって年周期成分が除去されて1970付近および1975付近の
+# 落ち込みが顕著になっている
+</command>
+			<property/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<edge from="4" to="29"/>
+		<edge from="14" to="19"/>
+		<edge from="38" to="23"/>
+		<edge from="0" to="18"/>
+		<edge from="8" to="27"/>
+		<edge from="21" to="20"/>
+		<edge from="10" to="4"/>
+		<edge from="24" to="28"/>
+		<edge from="12" to="38"/>
+		<edge from="3" to="24"/>
+		<edge from="34" to="12"/>
+		<edge from="4" to="32"/>
+		<edge from="20" to="2"/>
+		<edge from="22" to="5"/>
+		<edge from="4" to="0"/>
+		<edge from="26" to="13"/>
+		<edge from="4" to="33"/>
+		<edge from="6" to="35"/>
+		<edge from="28" to="1"/>
+		<edge from="13" to="36"/>
+		<edge from="17" to="14"/>
+		<edge from="4" to="31"/>
+		<edge from="4" to="8"/>
+		<edge from="7" to="16"/>
+		<edge from="27" to="17"/>
+		<edge from="9" to="30"/>
+		<edge from="33" to="34"/>
+		<edge from="15" to="7"/>
+		<edge from="4" to="25"/>
+		<edge from="29" to="15"/>
+		<edge from="4" to="26"/>
+		<edge from="4" to="3"/>
+		<edge from="32" to="22"/>
+		<edge from="37" to="9"/>
+		<edge from="18" to="6"/>
+		<edge from="4" to="21"/>
+		<edge from="4" to="37"/>
+	</graph>
+	<task>
+		<taskgroup>
+			<taskproperty/>
+		</taskgroup>
+	</task>
+</rflow>

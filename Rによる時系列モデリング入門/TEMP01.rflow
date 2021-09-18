@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE rflow [
+<!ENTITY lt "&#38;#60;">
+<!ENTITY gt "&#62;">
+<!ENTITY amp "&#38;#38;">
+<!ENTITY apos "&#39;">
+<!ENTITY quot "&#34;">
+]>
+<rflow>
+	<graph version="0.8" width="1331" height="507" locationtype="a" offsetx="0" offsety="0">
+		<setting>
+			<entry key="USE_GRID">true</entry>
+			<entry key="FOLDER">TEMP01</entry>
+			<entry key="GRID_DISTANCE2">10</entry>
+		</setting>
+<properties>
+<v key="packages"/>
+</properties>
+		<node id="0" date="1631358676048" uid="9be6cc2275fd5f07" x="330" y="80">
+			<command>data(Temperature)
+#plot(Temperature, ylim=c(0, 40))
+
+y &lt;- Temperature
+kfilter &lt;- 14
+ndata &lt;- length(Temperature)
+
+y[1:ndata] &lt;- NA
+for(i in 1:ndata){
+	i0 &lt;- max(i - kfilter, 1)
+	i1 &lt;- min(i + kfilter, ndata)
+	y[i] &lt;- median(Temperature[i0:i1])
+}
+plot(y, ylim=c(0,40), type=&apos;l&apos;)</command>
+			<property/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="1" date="1631358178122" uid="857cf18f9844fc3b" x="120" y="80">
+			<command>library(TSSS)
+data(HAKUSAN)
+x &lt;- as.ts(HAKUSAN[,1])
+plot(x)</command>
+			<property/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="2" date="1631359492752" uid="93e3c0d1b188705a" x="460" y="90">
+			<command>data(HAKUSAN)
+</command>
+			<property/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="3" date="1631358178122" uid="cbabb49bcebe6b8c" x="210" y="80">
+			<command>data(Nikkei225)
+plot(diff(log(Nikkei225)))</command>
+			<property/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+	</graph>
+	<task>
+		<taskgroup>
+			<taskproperty/>
+		</taskgroup>
+	</task>
+</rflow>
