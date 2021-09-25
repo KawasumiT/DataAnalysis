@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE rflow [
+<!ENTITY lt "&#38;#60;">
+<!ENTITY gt "&#62;">
+<!ENTITY amp "&#38;#38;">
+<!ENTITY apos "&#39;">
+<!ENTITY quot "&#34;">
+]>
+<rflow>
+	<graph version="0.8" width="1034" height="437" locationtype="a" offsetx="0" offsety="0">
+		<setting>
+			<entry key="USE_GRID">true</entry>
+			<entry key="FOLDER">1章</entry>
+			<entry key="GRID_DISTANCE2">10</entry>
+		</setting>
+<properties>
+<v key="packages"/>
+</properties>
+		<node id="0" date="1632494908079" uid="21a25aa36a1f2153" x="100" y="60">
+			<command>#install.packages(&quot;xlsx&quot;, dep=T);
+library(xlsx)
+dfEconomicData &lt;- read.xlsx(&quot;economicdata.xls&quot;,
+		sheetIndex=1 ,header=TRUE, encoding=&quot;UTF-8&quot;)
+plot(dfEconomicData$NA., dfEconomicData$indprod, ylim=c(0,120), type=&quot;l&quot;)
+</command>
+			<property/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+		<node id="1" date="1632496848441" uid="16b37a1fa5409556" x="100" y="180">
+			<command>par(mfrow=c(1,1), mar=c(2,2.5,3,1) + 0.1)
+myUnicorPlot(diff(dfEconomicData$indprod), lag=20, main=&quot;(a)の自己相関関数&quot;)</command>
+			<property/>
+			<option type="com.ef_prime.rflow.node.base.FreeNodeModel"/>
+		</node>
+	</graph>
+	<task>
+		<taskgroup>
+			<taskproperty/>
+		</taskgroup>
+	</task>
+</rflow>
